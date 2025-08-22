@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title> ShreeAnku Login</title>
+<meta name="color-scheme" content="dark light" />
+<style>
+  :root{
+    --bg1:#0f1020;
+    --bg2:#091426;
+    --acc1:#7c5cff;
+    --acc2:#00e5ff;
+    --acc3:#00ffa3;
+    --text:#e8ebff;
+    --muted:#9aa5c3;
+    --error:#ff5470;
+    --glass: rgba(255,255,255,0.06);
+    --glass-bright: rgba(255,255,255,0.12);
+    --blur: 20px;
+    --radius: 18px;
+    --shadow: 0 20px 60px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.06);
+    --duration: 500ms;
+    --bezier: cubic-bezier(.2,.8,.2,1);
+  }
+
+  /* Base layout */
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color:var(--text);
+    background: radial-gradient(1200px 800px at 20% 10%, #1b1d3b 0%, transparent 60%),
+                radial-gradient(900px 600px at 80% 90%, #022f42 0%, transparent 60%),
+                linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 100%);
+    overflow:hidden;
+  }
+
+  /* Animated background gradient sweep */
+  body::before{
+    content:"";
+    position:fixed; inset:-20%;
+    background:
+      conic-gradient(from 0deg, var(--acc1), var(--acc2), var(--acc3), var(--acc1));
+    filter:blur(90px) saturate(130%) opacity(.25);
+    animation: spin 22s linear infinite;
+    transform: translateZ(0);
+    pointer-events:none;
+  }
+  @keyframes spin{to{transform:rotate(1turn)}}
+
+  /* Particle canvas sits underneath UI */
+  #particles{
+    position:fixed; inset:0; z-index:0;
+  }
+
+  /* Decorative parallax orbs */
+  .orb{
+    position:fixed; border-radius:50%;
+    filter: blur(40px) saturate(140%);
+    opacity:.35; pointer-events:none; z-index:1;
+    mix-blend-mode: screen;
+  }
+  .orb.one{ width:420px; height:420px; background:radial-gradient(circle at 30% 30%, #7c5cff, transparent 60%);
+            top:8%; left:6%; }
+  .orb.two{ width:360px; height:360px; background:radial-gradient(circle at 70% 40%, #00e5ff, transparent 60%);
+            bottom:10%; right:8%; }
+  .orb.three{ width:300px; height:300px; background:radial-gradient(circle at 50% 60%, #00ffa3, transparent 60%);
+            top:40%; right:25%; }
+
+  /* Center wrapper with perspective for 3D parallax */
+  .stage{
+    position:relative; z-index:2;
+    display:grid; place-items:center;
+    min-height:100svh; padding:24px;
+    perspective: 1200px;
+  }
+
+  /* Glassmorphism card */
+  .card{
+    width:min(92vw, 440px);
+    background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border:1px solid rgba(255,255,255,.10);
+    transform-style: preserve-3d;
+    transform: rotateX(0deg) rotateY(0deg) translateZ(0);
+    transition: transform 900ms var(--bezier), box-shadow 600ms var(--bezier);
+    will-change: transform;
+    overflow:hidden;
+    opacity:0; translate: 0 20px; filter:saturate(90%) contrast(95%);
+    animation: cardIn .9s var(--bezier) .1s forwards;
+  }
+  @keyframes cardIn{
+    to{opacity:1; translate:0 0; filter:saturate(100%) contrast(100%)}
+  }
+
+  .cardHeader{
+    padding:28px 28px 10px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:12px; user-select:none;
+  }
+  .logo{
+    width:34px; height:34px; display:grid; place-items:center;
+    border-radius:11px;
+    background: radial-gradient(120% 120% at 20% 20%, #9a84ff, #00e5ff);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.25), 0 10px 30px rgba(0,0,0,.35);
+  }
+  .brand span{
+    font-weight:700; letter-spacing:.3px;
+    background: linear-gradient(90deg, #fff, #bfe9ff);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .subtitle{
+    color:var(--muted); margin:12px 0 0 46px; font-size:.96rem;
+  }
+
+  .cardBody{ padding:22px 28px 28px; }
+
+  /* Floating label fields */
+  .field{
+    position:relative; margin:18px 0 22px;
+  }
+  .input{
+    width:100%;
+    font: 500 1rem/1.15 inherit;
+    padding: 20px 46px 20px 16px;
+    color:var(--text);
+    background: rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius: 14px;
+    outline: none;
+    transition: border-color var(--duration) var(--bezier), box-shadow var(--duration) var(--bezier), background .3s;
+    box-shadow: inset 0 0 0 0 rgba(124,92,255,.25);
+  }
+  .input::placeholder{opacity:0}
+  .label{
+    position:absolute; left:14px; top:50%; translate:0 -50%;
+    padding:0 6px; color:var(--muted); background:transparent;
+    pointer-events:none; transition: transform var(--duration) var(--bezier), color var(--duration) var(--bezier), background var(--duration) var(--bezier);
+  }
+  .input:focus{
+    border-color: rgba(124,92,255,.85);
+    box-shadow: 0 10px 30px rgba(124,92,255,.25), inset 0 0 0 1px rgba(124,92,255,.55);
+    background: rgba(255,255,255,.06);
+  }
+  .input:not(:placeholder-shown) + .label,
+  .input:focus + .label{
+    transform: translateY(-30px) scale(.88);
+    color:#d8deff;
+    background: rgba(15,16,32,.9);
+    border-radius: 6px;
+  }
+
+  /* Icon buttons inside fields */
+  .iconBtn{
+    position:absolute; top:50%; right:10px; translate:0 -50%;
+    width:36px; height:36px; border-radius:10px;
+    border:none; display:grid; place-items:center; cursor:pointer;
+    background: transparent;
+    color: var(--muted);
+    transition: transform .35s var(--bezier), background .3s, color .3s, box-shadow .35s var(--bezier);
+    outline: none;
+  }
+  .iconBtn:hover{ color:#fff; transform: translateY(-50%) scale(1.06); }
+  .iconBtn:active{ transform: translateY(-50%) scale(.96); }
+
+  /* CTA button */
+  .btn{
+    appearance:none; border:none; cursor:pointer; width:100%;
+    padding:16px 18px; border-radius:14px; font-weight:700; letter-spacing:.3px;
+    color:#0b0c1a; background: linear-gradient(90deg, var(--acc1), var(--acc2) 50%, var(--acc3));
+    transition: transform .18s var(--bezier), filter .4s, box-shadow .45s var(--bezier);
+    box-shadow: 0 10px 30px rgba(0,0,0,.35), 0 0 0 0 rgba(255,255,255,0);
+    position:relative; overflow:hidden;
+  }
+  .btn:hover{ transform: translateY(-1px); filter:brightness(1.05); }
+  .btn:active{ transform: translateY(0); }
+  .btn:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
+
+  /* Ripple (span.ripple created by JS) */
+  .btn .ripple{
+    position:absolute; border-radius:50%; pointer-events:none; transform:scale(0);
+    background:rgba(255,255,255,.55); mix-blend-mode:overlay; filter: blur(2px);
+    animation:ripple .75s ease-out forwards;
+  }
+  @keyframes ripple{ to{ transform:scale(12); opacity:0 } }
+
+  /* Utility row */
+  .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:6px 0 18px; }
+  .link{
+    appearance:none; background:none; border:none; padding:0; color:#cfe7ff; cursor:pointer;
+    text-decoration:underline; text-underline-offset:3px;
+  }
+
+  /* Error & toast */
+  .error{ color:var(--error); margin:8px 2px 0; min-height:1.2em; }
+  .shake{ animation:shake .5s var(--bezier); }
+  @keyframes shake{
+    10%, 90% { transform: translateX(-1px); } 
+    20%, 80% { transform: translateX(2px); } 
+    30%, 50%, 70% { transform: translateX(-4px); } 
+    40%, 60% { transform: translateX(4px); } 
+  }
+  .toast{
+    position:fixed; left:50%; bottom:28px; translate:-50% 120%;
+    background: rgba(27,29,59,.8); color:#e8ebff;
+    border:1px solid rgba(255,255,255,.1);
+    padding:12px 16px; border-radius:12px; z-index:10;
+    box-shadow: var(--shadow); backdrop-filter: blur(12px);
+    transition: translate .6s var(--bezier), opacity .6s var(--bezier);
+    opacity:0;
+  }
+  .toast.show{ translate:-50% 0; opacity:1; }
+
+  /* Footer */
+  .foot{
+    margin-top:18px; color:var(--muted); font-size:.9rem; text-align:center;
+  }
+  .foot a{ color:#dfe7ff }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition:none !important; }
+    body::before{ display:none }
+  }
+</style>
+</head>
+<body>
+<canvas id="particles" aria-hidden="true"></canvas>
+<div class="orb one" aria-hidden="true"></div>
+<div class="orb two" aria-hidden="true"></div>
+<div class="orb three" aria-hidden="true"></div>
+
+<main class="stage" aria-label="Login form stage">
+  <section class="card" id="card" aria-label="Login panel">
+    <header class="cardHeader">
+      <div class="brand" aria-hidden="true">
+        <div class="logo" aria-hidden="true">
+          <!-- Simple geometric logo -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 12L12 4l8 8-8 8-8-8z" stroke="white" stroke-opacity=".9" stroke-width="2"/>
+            <circle cx="12" cy="12" r="2.8" fill="white" fill-opacity=".9"/>
+          </svg>
+        </div>
+        <span>ShreeAnku Login</span>
+      </div>
+      <p class="subtitle">Welcome back — please sign in</p>
+    </header>
+
+    <div class="cardBody">
+      <form id="loginForm" autocomplete="on" >
+        <!-- Email -->
+        <div class="field">
+          <input id="email" class="input" type="email" name="email" placeholder=" " required
+                 aria-label="Email address" autocomplete="email" inputmode="email" />
+          <label class="label" for="email">Email</label>
+          <button class="iconBtn" type="button" aria-label="Paste email" title="Paste email" id="pasteEmail">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M8 2h8v3h3v5h-2V7H7v14h5v2H5V5h3V2z"></path>
+              <path d="M21 14l-8 8h-4v-4l8-8 4 4zM14 20l6-6-2-2-6 6v2h2z"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Password -->
+        <div class="field">
+          <input id="password" class="input" type="password" name="password" placeholder=" " required minlength="6"
+                 aria-label="Password" autocomplete="current-password" />
+          <label class="label" for="password">Password</label>
+          <button class="iconBtn" type="button" aria-label="Show password" title="Show password" id="togglePwd">
+            <svg id="eyeIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" stroke="currentColor" stroke-width="2" />
+              <circle cx="12" cy="12" r="3" fill="currentColor" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="row">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer">
+            <input type="checkbox" id="remember" name="remember" style="accent-color:#7c5cff" />
+            Remember me
+          </label>
+          <button class="link" type="button" id="forgot">Forgot password?</button>
+        </div>
+
+        <button class="btn" type="submit" id="submitBtn" > <p><a href="index.html"> Sign in</button></a></p>
+        <div class="error" id="error" role="status" aria-live="polite"></div>
+
+        <p class="foot">No account? <a href="#" role="link">Create one</a></p>
+      </form>
+    </div>
+    <footer> @ShreeAnkush2025 . All rights reserved</footer>
+  </section>
+</main>
+
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ---------- Particle background (canvas) ---------- */
+(function(){
+  const c = document.getElementById('particles');
+  const ctx = c.getContext('2d', { alpha: true });
+  let w, h, dpr, particles = [], tick = 0;
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = c.width = Math.floor(innerWidth * dpr);
+    h = c.height = Math.floor(innerHeight * dpr);
+    c.style.width = innerWidth + 'px';
+    c.style.height = innerHeight + 'px';
+    particles = new Array(Math.max(60, Math.floor(innerWidth / 18))).fill().map(()=>({
+      x: Math.random()*w, y: Math.random()*h,
+      vx: (Math.random()-.5)*.15*dpr, vy: (Math.random()-.5)*.15*dpr,
+      r: (Math.random()*1.8 + .6)*dpr,
+      hue: Math.random()*360
+    }));
+  }
+  window.addEventListener('resize', resize, { passive:true });
+  resize();
+
+  function step(){
+    tick++;
+    ctx.clearRect(0,0,w,h);
+    for(const p of particles){
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0 || p.x > w) p.vx *= -1;
+      if(p.y < 0 || p.y > h) p.vy *= -1;
+      const glow = 0.25 + 0.25*Math.sin((tick+p.hue)*0.02);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r*4);
+      grd.addColorStop(0, `hsla(${p.hue}, 95%, 70%, ${0.9*glow})`);
+      grd.addColorStop(1, `hsla(${(p.hue+40)%360}, 95%, 60%, 0)`);
+      ctx.fillStyle = grd;
+      ctx.fill();
+    }
+    requestAnimationFrame(step);
+  }
+  step();
+})();
+
+/* ---------- 3D Parallax on card + orbs ---------- */
+(function(){
+  const card = document.getElementById('card');
+  const orbs = [...document.querySelectorAll('.orb')];
+  const limit = 10; // degrees
+
+  function tilt(e){
+    const rect = card.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+    const rx = (py - .5) * -2 * limit;
+    const ry = (px - .5) * 2 * limit;
+    card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+    // subtle orb parallax
+    orbs.forEach((o,i)=>{
+      const dx = (px-.5) * (6+i*3);
+      const dy = (py-.5) * (6+i*3);
+      o.style.transform = `translate(${dx}px, ${dy}px)`;
+    });
+  }
+
+  function reset(){
+    card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    orbs.forEach(o=> o.style.transform = 'translate(0,0)');
+  }
+
+  window.addEventListener('mousemove', tilt, { passive:true });
+  window.addEventListener('mouseleave', reset);
+
+  // Device tilt (mobile)
+  window.addEventListener('deviceorientation', (e)=>{
+    if(!e.beta && !e.gamma) return;
+    const rx = Math.max(Math.min((e.beta - 50)/10, 1), -1) * limit;
+    const ry = Math.max(Math.min((e.gamma)/20, 1), -1) * limit;
+    card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+  }, true);
+})();
+
+/* ---------- Form interactions ---------- */
+(function(){
+  const form = document.getElementById('loginForm');
+  const error = document.getElementById('error');
+  const toast = document.getElementById('toast');
+  const submitBtn = document.getElementById('submitBtn');
+  const togglePwd = document.getElementById('togglePwd');
+  const eyeIcon = document.getElementById('eyeIcon');
+  const pwd = document.getElementById('password');
+  const pasteEmail = document.getElementById('pasteEmail');
+  const email = document.getElementById('email');
+
+  // Password toggle with icon rotate
+  togglePwd.addEventListener('click', ()=>{
+    const isPw = pwd.type === 'password';
+    pwd.type = isPw ? 'text' : 'password';
+    togglePwd.setAttribute('aria-label', isPw ? 'Hide password' : 'Show password');
+    togglePwd.title = isPw ? 'Hide password' : 'Show password';
+    eyeIcon.style.transition = 'transform .35s cubic-bezier(.2,.8,.2,1)';
+    eyeIcon.style.transform = isPw ? 'rotate(180deg) scale(1.05)' : 'rotate(0deg) scale(1)';
+  });
+
+  // Paste from clipboard (graceful fallback)
+  pasteEmail.addEventListener('click', async ()=>{
+    try{
+      const text = await navigator.clipboard.readText();
+      if(text) { email.value = text; email.dispatchEvent(new Event('input')); }
+    }catch{ showToast('Clipboard access denied.'); }
+  });
+
+  // Ripple effect
+  submitBtn.addEventListener('click', (e)=>{
+    const r = document.createElement('span');
+    const rect = submitBtn.getBoundingClientRect();
+    const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+    const d = Math.max(rect.width, rect.height);
+    r.className = 'ripple'; r.style.width = r.style.height = d+'px';
+    r.style.left = (x - d/2) + 'px'; r.style.top = (y - d/2) + 'px';
+    submitBtn.appendChild(r);
+    r.addEventListener('animationend', ()=> r.remove());
+  });
+
+  // Demo validation + shake on error
+  form.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    error.textContent = '';
+    if(!email.value || !email.validity.valid){
+      fail('Please enter a valid email address.');
+      return;
+    }
+    if(!pwd.value || pwd.value.length < 6){
+      fail('Password must be at least 6 characters.');
+      return;
+    }
+    // Simulate async login success
+    showToast('Signed in successfully 🎉');
+    submitBtn.disabled = true;
+    submitBtn.style.filter = 'grayscale(40%)';
+    setTimeout(()=>{ submitBtn.disabled = false; submitBtn.style.filter=''; }, 1500);
+  });
+
+  function fail(msg){
+    error.textContent = msg;
+    const card = document.getElementById('card');
+    card.classList.remove('shake'); // restart animation
+    void card.offsetWidth; // force reflow
+    card.classList.add('shake');
+  }
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(()=> toast.classList.remove('show'), 2000);
+  }
+
+  // Accessibility: Enter submits, ESC clears error
+  window.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape'){ error.textContent=''; }
+  });
+})();
+</script>
+</body>
+</html>

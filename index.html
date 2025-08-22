@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ShreeAnkush E-commerce</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">ShreeAnku <span class="muted">Store</span></div>
+
+      <div class="search-wrap">
+        <input id="searchInput" type="search" placeholder="Search products..." />
+        <button id="voiceBtn" title="Voice search (mic)">🎤</button>
+        <button id="clearSearch" title="Clear">✕</button>
+      </div>
+
+      <div class="controls">
+        <select id="categorySelect" title="Category"></select>
+        <select id="sortSelect" title="Sort">
+          <option value="popular">Sort: Popular</option>
+          <option value="price_asc">Price: Low → High</option>
+          <option value="price_desc">Price: High → Low</option>
+          <option value="rating">Top rated</option>
+        </select>
+
+        <button id="wishlistBtn" class="ghost" aria-haspopup="dialog" title="Wishlist">
+          ❤️ <span id="wishCount" class="badge">0</span>
+        </button>
+
+        <button id="cartBtn" class="cart-btn" aria-haspopup="dialog" title="Cart">
+          🛒 <span id="cartCount" class="cart-count">0</span>
+        </button>
+
+        <!-- Proper Login Button -->
+        <a href="login.html" class="login-btn" title="Login / Sign In">👤 Login</a>
+
+        <!-- Theme controls -->
+        <select id="accentSelect" title="Accent color">
+          <option value="#4CAF50">Green</option>
+          <option value="#0ea5e9">Blue</option>
+          <option value="#f59e0b">Amber</option>
+          <option value="#ef4444">Red</option>
+          <option value="#8b5cf6">Violet</option>
+        </select>
+        <button id="mode-toggle" title="Toggle dark mode">🌙</button>
+      </div>
+    </div>
+
+    <!-- Deal banner -->
+    <div class="deal-banner container">
+      <div>
+        <strong>Deal of the Day:</strong> Extra 20% off on Headphones!
+      </div>
+      <div>Ends in <span id="dealTimer">--:--:--</span></div>
+      <button id="shopDeal" class="primary xs">Shop now</button>
+    </div>
+  </header>
+
+  <main class="container main-grid">
+    <section id="productGrid" class="products-grid" aria-live="polite"></section>
+  </main>
+
+  <!-- Quick View Modal -->
+  <div id="quickView" class="modal" aria-hidden="true">
+    <div class="modal-bg" data-close="quickView"></div>
+    <div class="modal-panel" role="dialog" aria-modal="true">
+      <button class="modal-close" data-close="quickView">✕</button>
+      <div class="quick-inner">
+        <img id="quickImage" src="" alt="" />
+        <div class="quick-info">
+          <h2 id="quickTitle"></h2>
+          <p id="quickCategory" class="muted"></p>
+          <p id="quickDesc" class="muted"></p>
+
+          <div class="rating-row">
+            <div id="quickAvgRating" class="stars"></div>
+            <button id="openReviews" class="ghost xs">Reviews</button>
+          </div>
+
+          <div class="price-row">
+            <div class="price" id="quickPrice"></div>
+            <div class="quick-actions">
+              <button id="quickAdd" class="primary">Add to cart</button>
+              <button id="quickWish" class="ghost">❤️ Wishlist</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviews Modal -->
+  <div id="reviewsModal" class="modal" aria-hidden="true">
+    <div class="modal-bg" data-close="reviewsModal"></div>
+    <div class="modal-panel medium" role="dialog" aria-modal="true">
+      <button class="modal-close" data-close="reviewsModal">✕</button>
+      <h3>Reviews for <span id="revTitle"></span></h3>
+
+      <div id="reviewsList" class="reviews-list"></div>
+
+      <form id="reviewForm" class="review-form">
+        <label>Rating
+          <select name="rating" required>
+            <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+            <option value="4">⭐⭐⭐⭐ (4)</option>
+            <option value="3">⭐⭐⭐ (3)</option>
+            <option value="2">⭐⭐ (2)</option>
+            <option value="1">⭐ (1)</option>
+          </select>
+        </label>
+        <label>Your review
+          <textarea name="text" rows="3" placeholder="Share your experience..." required></textarea>
+        </label>
+        <div class="form-actions">
+          <button class="primary" type="submit">Submit review</button>
+          <button class="ghost" type="button" data-close="reviewsModal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Wishlist Drawer -->
+  <aside id="wishlistDrawer" class="side-drawer" aria-hidden="true">
+    <div class="drawer-head">
+      <h3>Wishlist</h3>
+      <button class="ghost" data-close="wishlistDrawer">Close</button>
+    </div>
+    <div id="wishItems" class="drawer-body"></div>
+  </aside>
+
+  <!-- Cart Drawer -->
+  <aside id="cartDrawer" class="side-drawer" aria-hidden="true">
+    <div class="drawer-head">
+      <h3>Your cart</h3>
+      <button class="ghost" data-close="cartDrawer">Close</button>
+    </div>
+
+    <div id="cartItems" class="drawer-body"></div>
+
+    <div class="cart-summary">
+      <div class="line"><span>Subtotal</span><span id="subTotal">₹0.00</span></div>
+      <div class="line"><span>Shipping</span><span id="shipping">₹0.00</span></div>
+      <div class="line"><span>Tax</span><span id="tax">₹0.00</span></div>
+      <div class="line total"><span>Total</span><span id="grandTotal">₹0.00</span></div>
+      <div class="cart-actions">
+        <button id="checkoutBtn" class="primary" disabled>Proceed to checkout</button>
+        <button id="clearCart" class="ghost">Clear</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Checkout Modal -->
+  <div id="checkoutModal" class="modal" aria-hidden="true">
+    <div class="modal-bg" data-close="checkoutModal"></div>
+    <div class="modal-panel small" role="dialog" aria-modal="true">
+      <button class="modal-close" data-close="checkoutModal">✕</button>
+      <h2>Checkout</h2>
+      <form id="checkoutForm" class="checkout-form">
+        <label>Full name<input name="name" required /></label>
+        <label>Email<input name="email" type="email" required /></label>
+        <label>Shipping address<input name="address" required /></label>
+        <div class="row">
+          <label>City<input name="city" /></label>
+          <label>Postal code<input name="postal" /></label>
+        </div>
+
+        <div class="checkout-summary">
+          <div>Order total <strong id="checkoutTotal">₹0.00</strong></div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="primary">Place order</button>
+          <button type="button" class="ghost" data-close="checkoutModal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <form id="newsletterForm" class="newsletter">
+      <label>
+        <span>Subscribe for updates</span>
+        <input type="email" id="newsletterEmail" placeholder="you@example.com" required />
+      </label>
+      <button class="primary">Subscribe</button>
+    </form>
+
+    <div class="legal">
+      © <span id="year"></span> @Shreyashahirrao. All rights reserved
+    </div>
+
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119202.0535650318!2d75.49302158340268!3d20.99006453321301!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bd90fa4a1eab90f%3A0x37f67bd21bff0a3c!2sJalgaon%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1755255825939!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
